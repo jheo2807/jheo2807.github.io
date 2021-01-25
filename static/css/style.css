@@ -377,7 +377,7 @@ Extra (xl) large devices (large desktops, 1200px and up)
 /*------------------- Books ----------------*/
 
 .fixed {
-  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../images/할아버지.jpg');
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../images/aurora.jpg');
   /* make sure bg image is underneath (-1) 
   z-index: -1;*/
 }

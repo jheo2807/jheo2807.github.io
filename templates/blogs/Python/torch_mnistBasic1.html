@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Jaewoong Heo's - Python Torch</title>
+	<link rel="stylesheet" href="../../../../bootstrap-4.1.3-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../../../static/css/fixed.css">
+    <link rel="stylesheet" href="../../../../static/css/blogs.css">
+	<!-- Font Awesome libarary -->
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+</head>
+
+<body data-spy="scroll" data-target="#navbarResponsive">
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
+	<a class="navbar-brand" href="../../../../index.html#my-brain">
+		Back
+    </a>
+</nav>
+<div class="projects">
+
+<div class="row project">
+<div class="col-md-3 side-bar">
+    <ul>
+        <li><b>MNIST Ex.01</b></li>
+    </ul>
+</div>
+    
+<!-- ------------------------------ All Content goes here -------------------- -->
+<!--lets see the change-->
+<div class="col-md-6">
+    <h2>MNIST Example로 Torch 시작하기 - 01</h1>
+    <p class="date">date posted: 2021-02-07</p>
+    <br>
+    <div class="toc">
+        <h5>Contents</h5>
+        <ul>
+            <li><a href="#1">MNIST with PyTorch</a>
+                <ul>
+                    <li><a href="#1-1">전처리</a></li>
+                    <li><a href="#1-2">모델</a></li>
+                    <li><a href="#1-3">실행</a></li>
+                </ul>            
+            </li>
+
+            <li><a href="#reference">References</a></li>
+        </ul>
+    </div>
+    
+    <h5 id="1">Torch, Torch, Torch</h5>
+    <p>
+        텐서플로우랑 케라스로 어찌저찌 딥러닝을 하긴 했었는데... 대세도 토치라고 하고, 딥러닝에 코딩적 부분에 대해서 모르는게 너무 많아서 포스팅을 한다.<br>
+        잡설이지만, 같이 일하는 분으로부터 gist로 코드를 포스팅하는 법을 들어서 그걸 써보려 하는데 output부분을 어떻게 할 지 몰라서 고생중이다. 
+        그냥 ipynb파일 통으로 올려버리고 싶지만 그럼 너무 꺠진다. 그냥 노션이나 할까ㅠㅠ
+    </p>
+    <script src="https://gist.github.com/jheo2807/e330208bd8194418a7682f98b73ae346.js"></script>
+    <p>
+        저 라이브러리들을 임포트하는거부터 시작이다. <br>아 그리고 처음에 하면 pip install torch나 pip install torchvision에서 에러가 많이 날텐데, 
+        머리 쓰지 말고 그냥 pytorch사이트 Get Started에서 하라는 코드대로 치자. 인생이 편해진다.
+    </p>
+
+    <h6 id="1-1"><b>전처리</b></h6>
+
+    <p>
+        이 예제가 MNIST데이터로 하는거인 만큼, 전처리의 첫 시작은 MNIST데이터를 가져오는거다. 가져와보자.
+    </p>
+    
+    <script src="https://gist.github.com/jheo2807/3296dc0785e6a7b1624ab7abacef8b8f.js"></script>
+
+    <p>
+        gist로 output 이쁘게 넣는법을 모르겠다ㅠㅠ
+    </p>
+    <p>
+        하여튼 저게 어떤 식으로 전처리를 할 지 알려주는 과정이다. 처음에는 torchvision.transforms의 Compose라는 method(?)에서, ToTensor를 통해 이미지를 텐서로 바꾸고, 
+        Normalize를 통해 정규화를 한다.<br>
+        그런데 output을 보면 mean이 0.1307이고 std가 0.3081인데 그걸 어떻게 알고 정해주는 걸까??<br>
+        reference에 있는 링크를 보면, 사실은 PyTorch 튜토리얼에서는 저걸 왠만하면 0.5로 전부 쓰라고 나와있다. <br>그러나 저렇게 값이 다른게 대표적으로 2개가 있는데, 하나는
+        MNIST이고 하나는 imagenet example이다. 
+        이거는 CIFAR10같은 예제에서도 보통 0.5를 쓰는데, 직접 per-channel mean/std를 계산한 몇몇 예제만 저렇게 하는거다. 
+        특히 MNIST같은 경우 natural image가 아니여서 data distribution이 다르기 때문에 저렇게 정해논 mean/std값을 쓴다. 즉 뇌 빼고 따라하면 된다!
+    </p>
+    <p>
+        우리는 전처리를 약속한거지, 아직 MNIST데이터를 다운받지는 않았다. 다운받는 방법은 2가지가 있는데, 2개를 다 진행해보겠다.
+    </p>
+    <script src="https://gist.github.com/jheo2807/09c09fa48d74b3692f68dcd3bb498643.js"></script>
+    <p>
+        데이터를 다운받았다. 눈 여겨 볼 부분은 안쪽에 transform부분이 위에서 약속한 mnist_transform인지, None인지다.<br>
+        나는 전처리 된 데이터를 MNIST_digit이라는 폴더에, 전처리 안하고 받아 본 데이터를 MNIST_notrans에 집어넣었다.<br>        
+        저 뒤에 train = True는 이게 트레인용이냐 테스트용이냐는거고, download는 실제로 다운로드 할지 말지라는데... 해야하는거 아닌감?
+    </p>
+    <p>
+        두개가 어떻게 다른지, 받은 데이터가 대충 어떤 모양인지 봐보자.
+    </p>
+
+    <script src="https://gist.github.com/jheo2807/9fc44ffbefefdc923a5063d02a2cea9f.js"></script>
+
+    <p>
+        전처리 해서 가져온 놈은 저렇게 아래 Transform됐다고 뜬다. 어떤 짓을 했는지, 노멀라이즈 할때 파라메타는 어떻게 줬는지.<br>
+        데이터 생긴 모양을 보니, 흑백이니까 1,0으로 된 색에다가 28*28사이즈 데이터가 있다.<br>
+        조금 더 자세히, 원초적으로, 원래 MNIST 수기 이미지를 확인해보자
+    </p>
+    <script src="https://gist.github.com/jheo2807/eca1e13bdb2f670973711bfc2d5c13aa.js"></script>
+    <p>
+        이쁘게 포스팅하기 너무 어렵다... 그림 아웃풋때문에 그냥 ipynb파일 썼다ㅠㅠ
+    </p>
+    <p>
+        하여튼, 저렇게 이미지 픽셀 데이터와 라벨(정답)데이터로 이미지가 로드되는 걸 볼 수 있다.<br>
+        전처리 하지 않고 가져온 뒤, 나중에 전처리 할 수 있을까?
+    </p>
+    <script src="https://gist.github.com/jheo2807/c10a8ae2013f3433b63929adceaca25d.js"></script>
+    <p>
+        된다. 저거를 그냥 for loop 돌리면 전처리 될거같다. 귀찮아서 해보진 않았다. 하튼 이제 어느정도 전처리를 했다.
+    </p>
+
+
+
+    
+    
+    <h6 id="1-2"><b>모델</b></h6>
+    <p>
+        모델은 아주 기본적인 DNN을 쓸거다. Deep 이라고 하기 뭐할 정도로 hidden layer 하나 달린...<br>
+        forward prop 과정은:
+    </p>
+    <p>
+        input(784 노드) -> hidden layer(256 node) -> relu -> output(10 node) -> softmax
+    </p>
+    <p>
+        이다. 이론적인 내용은 이 포스팅에선 생략하겠다. XOR같은 얘기 나오면 쓸게 너무 많아... 
+    </p>
+    <script src="https://gist.github.com/jheo2807/8818b5f19d98ac7ccd1cab94104d9a7d.js"></script>
+    <p>
+        써진 대로 보면 된다. 이쁘기만 하면 그냥 Jupyter Notebook을 통째로 올릴텐데...<br>
+        모델 과정은 의외로 볼 게 없다. 초심플 DNN이라 그럴테지만, 하튼 nn.Module을 상속받은 후, __init__부분에 원하는 만큼의 layer를 만들어준다. 
+        나는 256개 node 있는거 하나 만든거다. 그리고 output노드의 dimension도 거기서 정해준다.<br>
+        forward하는 부분은, input을 x로 받은 뒤, 그 x를 뭐 dim transform 한다던지, 어떠어떤 act.f에 넣어 준다던데 하는 걸 순차적으로 하면 된다.<br>
+        남들 거도 그냥 위에서부터 읽으면 되겠네.
+    </p>
+    <script src="https://gist.github.com/jheo2807/21791ab5dcbed25108a8a1d7e7a3d3ce.js"></script>
+    <p>
+        이런 식으로 인스턴스 만들어서 정보 볼 수도 있으니 참고 바란다.
+    </p>
+
+    
+    <h6 id="1-3"><b>실행</b></h6>
+    <p>
+        실행을 한다는 것은, 전처리된 데이터를 모델에 얹혀서 내가 정의한 epoch 수만큼 돌린다는거다.<br>
+        어떤 데이터를 넘길 지, 배치 사이즈는 얼마로 할 지 정해서 DataLoader를 만들어보자.
+    </p>
+    <script src="https://gist.github.com/jheo2807/5ba2c58df165beb9a3180401039f64f7.js"></script>
+    <p>
+        일단 저 shuffle부터 보자. 저 값을 True로 하면, 한번 배치 사이즈만큼 데이터를 로드할 때, 중복된 데이터를 섞이게 한다.<br>
+        즉 3000개 데이터를 300 배치사이즈 10개 배치로 하면, 1번째 배치랑 2번째 배치랑 서로 겹치는 데이터도 있고, 3000개 데이터 중 아예 배치에 못 끼는 데이터도 있는거다.<br>
+        나는 여기서 배치사이즈를 3000으로 했다. 결과값 빨리 나오라고 그런건데, 보통 내가 알기로는 sqrt(데이터사이즈)로 알고있다. 이유는 모름...<br>
+        하튼 나는 배치사이즈를 3000으로 했으니 20번 데이터를 로드할거다. 
+    </p>
+    <script src="https://gist.github.com/jheo2807/7fc1ed68138b15c3c1c992c6f3cc8d8d.js"></script>
+    <p>
+        러닝 레이트랑 어떤 옵티마이저 쓸지(sto.grad.descent), 이포크는 몇 번 돌릴 지 정했다. 내 DNN은 model이라는 인스턴스가 받을거고,
+        저 train_loss_list랑 test_loss_list는 학습 진행 튀지 않고 잘 됐는지 보는건데 귀찮아서 플롯을 안했넹ㅎ 하튼 굳이 에센셜한건 아님.
+    </p>
+    <p>
+        자 실행해보자. 결과까지 나오는 for-loop이다.
+    </p>
+    <script src="https://gist.github.com/jheo2807/742622dad5e8b51083d6c85b94ead209.js"></script>
+    <p>
+        아 길다. 최대한 하나 하나 보자.
+    </p>
+    <p>
+        그 두번째 줄에 model.train 저 부분부터 뭔가 잘 모르겠더라. 한번 보자하니
+    </p>
+    <script src="https://gist.github.com/jheo2807/78f50c4e098147dbbf9631adb91aa9ea.js"></script>
+    <p>
+        음... 사실 아직도 잘 모르겠다. 모델이 train 모드랑 test모드로 구별되는건가? 21번째 줄에 eval모드가 있는거로 보면 그럴거같긴 한데... 패스
+    </p>
+    <p>
+        윗 부분에서 DataLoader부분을 적어놓긴 했지만 그렇게 와닿지가 않았다. 면밀히 살펴보았는데...
+    </p>
+    <script src="https://gist.github.com/jheo2807/69cddd056afdea236b1471bfa641429f.js"></script>
+    <p>
+        어떤 method들이 있는지 보면 좀 힌트가 될까 했는데 별로 그렇지 않았다ㅠㅠ
+    </p>
+    <p>
+        결국 머리가 나빠서 그냥 다 봤다.
+    </p>
+    <script src="https://gist.github.com/jheo2807/133fc3baa7aa4b120ea79a6f4f029330.js"></script>
+    <p>
+        오호... 이게 보니까, 데이터로더에 데이터가 저장된게 아니라 데이터를 어떻게 가져올 지 정하기만 한거다. 그래서 내가 위에서 dir이니 help니 해도 실제 데이터를 볼 수 없던거다.<br>
+        찾아보니 DataLoader는 3파트로 구성되는데, 데이터를 다운로드하는 파트(__init__), 인덱스에 해당하는 아이템을 넘기는 파트(__getitem__), 데이터 사이즈를 넘겨주는 파트(__len__(self))이다.<br>
+        저 결과를 보아하니, 배치 인덱스는, 내가 배치사이즈3000으로 정했으니 20개 배치 나오는데 그거인거같고, 저 라벨값이 MNIST 실제 라벨값이다.
+    </p>
+    <script src="https://gist.github.com/jheo2807/d25ca235c333969904022b2122b10950.js"></script>
+    <p>
+        이렇게, 하나 배치 사이즈가 3000이니, 라벨, 즉 MNIST데이터가 한 배치당 3000개씩 들어있는 구조인거다. 
+    </p>
+    <script src="https://gist.github.com/jheo2807/b9217d275b6cdb3b117a206dc9b7c0e1.js"></script>
+    <p>
+        이렇게 데이터를 프린트해보면, 채널 1개짜리 28*28 데이터가 3000개씩 있는 걸 볼 수 있다.
+    </p>
+    <p>
+        저렇게 데이터를 로드할 때마다, zero_grad를 통해 optimizer grad를 0으로 초기화해줘야 한다. <br>
+        이제 로드되고 초기화 된 데이터를 우리 DNN에 넣으면
+    </p>
+    <script src="https://gist.github.com/jheo2807/a24427bd98916924edb1759a99b45bb9.js"></script>
+    <p>
+        요렇게 20개의 배치들의 결과를 볼 수 있다.
+    </p>
+    <p>
+        이 딥러닝이란게, forward -> loss function computation -> backward -> updating weight 순으로 진행되는데, 이제 우리가 forward까지 한거다.<br>
+        이제 loss f compute 하는 부분이 저 F.nll_loss인데, 저거에 대해서도 help나 getsource를 해봤으나 쉽지 않았다... 
+        링크를 통해 negative log likelihood라는거까진 알았는데 뭔가 확 와닿진 않는다.<br>
+        코드를 보면 아웃풋과 그 정답을 가지고 뭔가를 하는거같은데, 프린트를 해봐도 잘 와닿지는 않는다.
+    </p>
+    <script src="https://gist.github.com/jheo2807/2851ec7f0d3ae83960da042443ca16d9.js"></script>
+    <p>
+        하튼 그렇게 구한 loss를 다시 넘겨줘서 dloss/dx를 해준다. autograd라는 method가 쓰일 것 같은데, 수도코드로는 대충
+    </p>
+    <pre>
+        x.grad += dloss/dx
+    </pre>
+    <p>
+        느낌이다. 이거를 가중치 업데이팅해주는 optimizer.step부분은 수도코드로 표현하면
+    </p>
+    <pre>
+        x += -lr * x.grad
+    </pre>
+    <p>
+        느낌이다. 뒷 부분은 with 블록을 통해 torch가 grad를 계산하지 않게 한다. 즉 test set에서는 forward만 하고(손실계산까지만) 실제와 비교하면 끝난다.
+    </p>
+    <p>
+        근데 너무 포스팅이 베끼기에 용두사미다. 이럴거면 그냥 ipynb 통째로 복붙이 낫겠다.
+    </p>
+
+
+
+
+    
+
+
+
+
+    <div id='reference' class="references">
+        <h5>References:</h5>
+        <ul>
+            <li><a href="https://everyday-image-processing.tistory.com/90?catergory=926549">생초보의 파이토치 일기 - MNIST 손글씨 데이터 분류 99% 달성하기 1</a></li>
+            <li><a href="https://tutorials.pytorch.kr/beginner/nn_tutorial.html">TORCH.NN 이 실제로 무엇인가요?</a></li>
+            <li><a href="https://airsbigdata.tistory.com/202">[ML/DL] softmax와 negative log-likelihood</a></li>
+            <li><a href="https://tutorials.pytorch.kr/beginner/blitz/neural_networks_tutorial.html">신경망(NEURAL NETWORKS)</a></li>
+            <li><a href="https://discuss.pytorch.org/t/what-does-the-backward-function-do/9944">What does the backward() function do?</a></li>
+            <li><a href="https://discuss.pytorch.org/t/normalization-in-the-mnist-example/457/4">Normalization in the mnist example</a></li>
+            <li><a href="http://www.geo.mtu.edu/rs/back/digital/">Digital Image Processing</a></li>
+            <li><a href="https://wingnim.tistory.com/33">Pytorch 머신러닝 튜토리얼 강의 8 (PyTorch DataLoader)</a></li>
+        </ul>
+
+    </div>
+</div>
+
+</div>
+</body>
+
+</html>

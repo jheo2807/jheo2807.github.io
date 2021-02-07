@@ -240,6 +240,15 @@ output
 
 40920
     </pre>
+    <p>
+        Instance가 Method를 실행한다는건, __getattribute__()로 bound된 method를 가져온 후 method를 실행하는 거다. 그리고 그 method를 가져오는 순서는 __mro__를 따른다.
+        MRO(method resolution order)는 method를 확인하는 순서이고, 이 파이썬이 다중으로부터 상속받는게 가능하다. 예를 들어 지금 cal 클래스는 Base로부터 상속을 받았는데, Base말고도 Base2에서도
+        상속을 받았다고 하자. 근데 Base2dpeh operator1이라는 method가 있으면??
+    </p>
+
+    <p>
+        class cal(Base2, Base)라고 정의될 경우 MRO는 왼쪽부터! Base2부터 본다. 이 MRO를 통해 상속받은 최상위 고조할아버지까지 알 수가 있다. cal.__mro__라고 치면 됨
+    </p>
 
 
 
